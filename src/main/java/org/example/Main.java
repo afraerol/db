@@ -9,9 +9,8 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
+
         DatabaseManager dbInstance = DatabaseManager.getInstance();
-
-
         System.out.println("Connected to database");
 
             // columns: id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50), surname VARCHAR(50), depname VARCHAR(50));
@@ -103,23 +102,6 @@ public class Main {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
-
-        // statement.executeUpdate(insertSQL);
-        /*String[] emplist = {
-                "INSERT INTO employee (name, surname, depname) VALUES ('Uygar', 'İşiçelik', 'software')",
-                "INSERT INTO employee (name, surname, depname) VALUES ('Sarper', 'Kumcu', 'software')",
-                "INSERT INTO employee (name, surname, depname) VALUES ('Cansu', 'Bozkurt', 'software')"
-        };
-
-        for(String emp : emplist) {
-            try {
-                statement.executeUpdate(emp);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }*/
         System.out.println("Data inserted");
 
         System.out.println("Please choose another option from the menu");
