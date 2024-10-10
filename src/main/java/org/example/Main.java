@@ -6,21 +6,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        DatabaseManager dbInstance = DatabaseManager.getInstance();
 
-        String jdbcUrl = "jdbc:mysql://localhost:3306/test-docker";
-        String username = "afra";
-        String password = "afra";
 
-        Connection connection = null;
-        Statement statement = null;
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            connection = DriverManager.getConnection(jdbcUrl, username, password);
-            System.out.println("Connected to database");
-            statement = connection.createStatement();
+        System.out.println("Connected to database");
 
             // columns: id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50), surname VARCHAR(50), depname VARCHAR(50));
             // String updateSQL = UPDATE employee SET depname='product' WHERE name='Efe';
@@ -37,24 +29,11 @@ public class Main {
             Scanner input = new Scanner(System.in);
             int option = input.nextInt();
 
-            menu(connection,statement,option);
-
-
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (statement != null) statement.close();
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-
+            menu(dbInstance.connection,dbInstance.statement,option);
 
 
     }
+
     public static void menu(Connection connection, Statement statement, int option) throws SQLException {
 
 
@@ -148,7 +127,6 @@ public class Main {
         menu(connection,statement,option);
 
     }
-
     public static void updateTable(Connection connection, Statement statement) throws SQLException {
         Scanner input = new Scanner(System.in);
         System.out.println("Please enter the update command line:");
@@ -167,7 +145,6 @@ public class Main {
 
 
     }
-
     public static void deleteTable(Connection connection, Statement statement) throws SQLException {
         Scanner input = new Scanner(System.in);
         System.out.println("Please enter the delete command line:");
@@ -185,23 +162,37 @@ public class Main {
 
     }
     public static void displayTable(Connection connection, Statement statement) throws SQLException {
+        System.out.println("Please enter the table name:");
         Scanner input = new Scanner(System.in);
-        String selectSQL2 = "SELECT * FROM employee";
+        String tname = input.nextLine();
 
-        ResultSet resultSet = null;
-        try {
-            resultSet = statement.executeQuery(selectSQL2);
+        DatabaseMetaData metaData = connection.getMetaData();
+        ResultSet columns = metaData.getColumns(null, null, tname, null);
+        List<String> columnNames = new ArrayList<>();
+        while (columns.next()) {
+            String columnName = columns.getString("COLUMN_NAME");
+            columnNames.add(columnName);
+        }
+        if (columnNames.isEmpty()) {
+            System.out.println("Table " + tname + " does not exist or has no columns.");
+            return;
+        }
+
+        String selectSQL = "SELECT * FROM "+ tname+";";
+
+        try (ResultSet resultSet = statement.executeQuery(selectSQL)) {
+            while (resultSet.next()) {
+                // Step 5: Dynamically retrieve and display the values for each column
+                for (String columnName : columnNames) {
+                    String value = resultSet.getString(columnName);
+                    System.out.print(columnName + ": " + value + " | ");
+                }
+                System.out.println(); // Move to the next line after each row
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
-        while (resultSet.next()) {
-            int id = resultSet.getInt("id");
-            String name = resultSet.getString("name");
-            String surname = resultSet.getString("surname");
-            String depname = resultSet.getString("depname");
 
-            System.out.println("ID: " + id + ", Name: " + name + ", Surname: " + surname + ", Depname: " + depname);
-        }
         System.out.println("Please choose another option from the menu");
         int option = input.nextInt();
         menu(connection,statement,option);
