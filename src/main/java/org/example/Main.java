@@ -1,6 +1,9 @@
 package org.example;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -86,26 +89,44 @@ public class Main {
     }
     public static void addValue(Connection connection, Statement statement) throws SQLException {
         Scanner input = new Scanner(System.in);
-            System.out.println("Please enter the  name");
-            String name = input.nextLine();
-            System.out.println("Please enter the surname");
-            String surname = input.nextLine();
-            System.out.println("Please enter the department name");
-            String depname = input.nextLine();
+            System.out.println("Please enter the table name");
+            String tname = input.nextLine();
 
-        String insertSQL = "INSERT INTO employee (name, surname, depname) VALUES (?,?,?)";
+        DatabaseMetaData metaData = connection.getMetaData();
+        ResultSet columns = metaData.getColumns(null, null, tname, null);
+
+        List<String> columnNames = new ArrayList<>();
+        while (columns.next()) {
+            String columnName = columns.getString("COLUMN_NAME");
+            columnNames.add(columnName);
+        }
+        if (columnNames.isEmpty()) {
+            System.out.println("Table " + tname + " does not exist or has no columns.");
+            return;
+        }
+        List<String> values = new ArrayList<>();
+        for (String columnName : columnNames) {
+            System.out.println("Please enter value for " + columnName + ":");
+            String value = input.nextLine();
+            values.add(value);
+        }
+
+        String columnsJoined = String.join(", ", columnNames);
+        String placeholders = String.join(", ", Collections.nCopies(values.size(), "?"));
+        String insertSQL = "INSERT INTO " + tname + " (" + columnsJoined + ") VALUES (" + placeholders + ")";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, surname);
-            preparedStatement.setString(3, depname);
-
+            for (int i = 0; i < values.size(); i++) {
+                preparedStatement.setString(i + 1, values.get(i));  // Set each value dynamically
+            }
             int rowsAffected = preparedStatement.executeUpdate();
-            System.out.println("Inserted " + rowsAffected + " row(s) into employee table.");
-        }
-        catch (SQLException e) {
+            System.out.println("Inserted " + rowsAffected + " row(s) into " + tname + " table.");
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
+
         // statement.executeUpdate(insertSQL);
         /*String[] emplist = {
                 "INSERT INTO employee (name, surname, depname) VALUES ('Uygar', 'İşiçelik', 'software')",
