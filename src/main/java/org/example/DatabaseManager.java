@@ -25,14 +25,12 @@ public class DatabaseManager {
     }
 
 
-    public static DatabaseManager getInstance() throws SQLException, ClassNotFoundException {
+    public static DatabaseManager getInstance() throws SQLException {
         try {
             if (instance == null) {
                 instance = new DatabaseManager();
             }
             return instance;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -47,9 +45,9 @@ public class DatabaseManager {
     }
 
     public static void menu(Connection connection, Statement statement) throws SQLException {
-        System.out.println("MENU");
-        System.out.println("Please choose from the menu:");
-        System.out.println("1) Create Table \n"+
+        System.out.println("MENU \n" +
+                "Please choose from the menu: \n" +
+                "1) Create Table \n"+
                 "2) Add Value to the Table \n"+
                 "3) Update the Table \n"+
                 "4) Delete from the Table \n"+
@@ -62,7 +60,7 @@ public class DatabaseManager {
 
         switch (usersChoice) {
             case 1: createTable(connection, statement);break;
-            case 2: addValue(connection, statement);break;
+            case 2: insertValue(connection, statement);break;
             case 3: updateTable(connection, statement);break;
             case 4: deleteTable(connection, statement);break;
             case 5: displayTable(connection, statement);break;
@@ -70,62 +68,59 @@ public class DatabaseManager {
     }
 
     public static void createTable(Connection connection, Statement statement) throws SQLException {
-        Scanner input = new Scanner(System.in);
+        Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the table name");
-        String tableName = input.nextLine();
-        System.out.println("Please enter the columns of the table: ");
-        String columnsOfTheTable = input.nextLine();
+        String tableName = inputScanner.nextLine();
 
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS "+ tableName + " ("+ columnsOfTheTable;
+        System.out.println("Please enter the columns of the table: ");
+        String columnsOfTheTable = inputScanner.nextLine();
+
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS "+ tableName + " ("+ columnsOfTheTable+ ");";
         statement.executeUpdate(createTableSQL);
         System.out.println("Table is created");
-
 
         menu(connection,statement);
     }
 
-    public static void addValue(Connection connection, Statement statement) throws SQLException {
-        Scanner input = new Scanner(System.in);
+    public static void insertValue(Connection connection, Statement statement) throws SQLException {
+        Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the table name");
-        String tableName = input.nextLine();
+        String tableName = inputScanner.nextLine();
 
         DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet columns = metaData.getColumns(null, null, tableName, null);
+        ResultSet columnsOfTheTable = metaData.getColumns(null, null, tableName, null);
 
-        List<String> columnNames = new ArrayList<>();
-        while (columns.next()) {
-            String columnName = columns.getString("COLUMN_NAME");
-            columnNames.add(columnName);
+        List<String> columnNamesList = new ArrayList<>();
+        while (columnsOfTheTable.next()) {
+            String columnName = columnsOfTheTable.getString("COLUMN_NAME");
+            columnNamesList.add(columnName);
         }
-        if (columnNames.isEmpty()) {
+        if (columnNamesList.isEmpty()) {
             System.out.println("Table " + tableName + " does not exist or has no columns.");
             return;
         }
-        List<String> values = new ArrayList<>();
-        for (String columnName : columnNames) {
+        List<String> valuesList = new ArrayList<>();
+        for (String columnName : columnNamesList) {
             System.out.println("Please enter value for " + columnName + ":");
-            String value = input.nextLine();
-            values.add(value);
+            String value = inputScanner.nextLine();
+            valuesList.add(value);
         }
 
-        String columnsJoined = String.join(", ", columnNames);
-        String placeholders = String.join(", ", Collections.nCopies(values.size(), "?"));
-        String insertSQL = "INSERT INTO " + tableName + " (" + columnsJoined + ") VALUES (" + placeholders + ")";
+        String columnsJoined = String.join(", ", columnNamesList);
+        String placeHolder = String.join(", ", Collections.nCopies(valuesList.size(), "?"));
+        String insertValueSQL = "INSERT INTO " + tableName + " (" + columnsJoined + ") VALUES (" + placeHolder + ")";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
-            for (int i = 0; i < values.size(); i++) {
-                preparedStatement.setString(i + 1, values.get(i));  // Set each value dynamically
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertValueSQL)) {
+            for (int i = 0; i < valuesList.size(); i++) {
+                preparedStatement.setString(i + 1, valuesList.get(i));
             }
             int rowsAffected = preparedStatement.executeUpdate();
             System.out.println("Inserted " + rowsAffected + " row(s) into " + tableName + " table.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("Data inserted");
-
 
         menu(connection,statement);
-
     }
 
     public static void updateTable(Connection connection, Statement statement) throws SQLException {
