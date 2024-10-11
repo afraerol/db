@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-public class DatabaseManager {
+public class DatabaseManager implements DatabaseOperations{
 
     private static DatabaseManager instance;
 
@@ -42,7 +42,7 @@ public class DatabaseManager {
         return statement;
     }
 
-    public static void menu(Connection connection, Statement statement) throws SQLException {
+    public void menu(Connection connection, Statement statement) throws SQLException {
         System.out.println("MENU \n" +
                 "Please choose from the menu: \n" +
                 "1) Create Table \n"+
@@ -65,7 +65,7 @@ public class DatabaseManager {
         }
     }
 
-    private static void createTable(Connection connection, Statement statement) throws SQLException {
+    public void createTable(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the table name");
         String tableName = inputScanner.nextLine();
@@ -80,7 +80,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    private static void insertValue(Connection connection, Statement statement) throws SQLException {
+    public void insertValue(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the table name");
         String tableName = inputScanner.nextLine();
@@ -116,7 +116,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    private static void updateTable(Connection connection, Statement statement) throws SQLException {
+    public void updateTable(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the update command line:");
         String updateSQL = inputScanner.nextLine();
@@ -132,7 +132,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    private static void deleteTable(Connection connection, Statement statement) throws SQLException {
+    public void deleteTable(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the delete command line:");
         String deleteSQL = inputScanner.nextLine();
@@ -148,7 +148,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    private static void displayTable(Connection connection, Statement statement) throws SQLException {
+    public void displayTable(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the table name:");
         String tableName = inputScanner.nextLine();
@@ -190,3 +190,4 @@ public class DatabaseManager {
     }
 
 }
+
