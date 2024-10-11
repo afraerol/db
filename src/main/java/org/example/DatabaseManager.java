@@ -118,6 +118,8 @@ public class DatabaseManager {
             System.out.println("Inserted " + rowsAffected + " row(s) into " + tableName + " table.");
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Error inserting values into " + tableName + " table. Please try again.");
+            menu(connection,statement);
         }
 
         menu(connection,statement);
@@ -132,7 +134,8 @@ public class DatabaseManager {
             statement.executeUpdate(updateSQL);
             System.out.println("The table is updated");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Error in updating table. Please try again.");
+            menu(connection,statement);
         }
 
         menu(connection,statement);
@@ -147,7 +150,8 @@ public class DatabaseManager {
             statement.executeUpdate(deleteSQL);
             System.out.println("Data deleted");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Error in deleting table. Please try again.");
+            menu(connection,statement);
         }
 
         menu(connection,statement);
@@ -182,6 +186,8 @@ public class DatabaseManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Error in getting values from " + tableName + " table.");
+            menu(connection,statement);
         }
 
         menu(connection,statement);
