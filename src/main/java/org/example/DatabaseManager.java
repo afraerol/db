@@ -16,14 +16,12 @@ public class DatabaseManager {
     String jdbcUrl = "jdbc:mysql://localhost:3306/test-docker";
     String username = "afra";
     String password = "afra";
-
-
+    
     private DatabaseManager() throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.cj.jdbc.Driver");
         connection = DriverManager.getConnection(jdbcUrl, username, password);
         statement = connection.createStatement();
     }
-
 
     public static DatabaseManager getInstance() throws SQLException {
         try {

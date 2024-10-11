@@ -15,6 +15,5 @@ public class Main {
         // delete: DELETE FROM employee WHERE id = 4;
 
         dbInstance.menu(dbInstance.getConnection(), dbInstance.getStatement());
-
     }
 }
