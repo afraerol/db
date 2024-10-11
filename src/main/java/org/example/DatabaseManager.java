@@ -16,7 +16,7 @@ public class DatabaseManager {
     String jdbcUrl = "jdbc:mysql://localhost:3306/test-docker";
     String username = "afra";
     String password = "afra";
-    
+
     private DatabaseManager() throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.cj.jdbc.Driver");
         connection = DriverManager.getConnection(jdbcUrl, username, password);
@@ -65,7 +65,7 @@ public class DatabaseManager {
         }
     }
 
-    public static void createTable(Connection connection, Statement statement) throws SQLException {
+    private static void createTable(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the table name");
         String tableName = inputScanner.nextLine();
@@ -80,7 +80,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    public static void insertValue(Connection connection, Statement statement) throws SQLException {
+    private static void insertValue(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the table name");
         String tableName = inputScanner.nextLine();
@@ -116,7 +116,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    public static void updateTable(Connection connection, Statement statement) throws SQLException {
+    private static void updateTable(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the update command line:");
         String updateSQL = inputScanner.nextLine();
@@ -132,7 +132,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    public static void deleteTable(Connection connection, Statement statement) throws SQLException {
+    private static void deleteTable(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the delete command line:");
         String deleteSQL = inputScanner.nextLine();
@@ -148,7 +148,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    public static void displayTable(Connection connection, Statement statement) throws SQLException {
+    private static void displayTable(Connection connection, Statement statement) throws SQLException {
         Scanner inputScanner = new Scanner(System.in);
         System.out.println("Please enter the table name:");
         String tableName = inputScanner.nextLine();
@@ -177,7 +177,7 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
-    public static List<String> getColumnNamesList(Connection connection, String tableName) throws SQLException {
+    private static List<String> getColumnNamesList(Connection connection, String tableName) throws SQLException {
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet columnsOfTheTable = metaData.getColumns(null, null, tableName, null);
 
