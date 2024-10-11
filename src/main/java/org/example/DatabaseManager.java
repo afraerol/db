@@ -87,26 +87,19 @@ public class DatabaseManager {
         System.out.println("Please enter the table name");
         String tableName = inputScanner.nextLine();
 
-        DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet columnsOfTheTable = metaData.getColumns(null, null, tableName, null);
-
-        List<String> columnNamesList = new ArrayList<>();
-        while (columnsOfTheTable.next()) {
-            String columnName = columnsOfTheTable.getString("COLUMN_NAME");
-            columnNamesList.add(columnName);
-        }
-        if (columnNamesList.isEmpty()) {
+        if (getColumnNamesList(connection,tableName).isEmpty()) {
             System.out.println("Table " + tableName + " does not exist or has no columns.");
             return;
         }
+
         List<String> valuesList = new ArrayList<>();
-        for (String columnName : columnNamesList) {
+        for (String columnName : getColumnNamesList(connection,tableName)) {
             System.out.println("Please enter value for " + columnName + ":");
             String value = inputScanner.nextLine();
             valuesList.add(value);
         }
 
-        String columnsJoined = String.join(", ", columnNamesList);
+        String columnsJoined = String.join(", ", getColumnNamesList(connection,tableName));
         String placeHolder = String.join(", ", Collections.nCopies(valuesList.size(), "?"));
         String insertValueSQL = "INSERT INTO " + tableName + " (" + columnsJoined + ") VALUES (" + placeHolder + ")";
 
@@ -162,14 +155,7 @@ public class DatabaseManager {
         System.out.println("Please enter the table name:");
         String tableName = inputScanner.nextLine();
 
-        DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet columnsOfTheTable = metaData.getColumns(null, null, tableName, null);
-        List<String> columnNamesList = new ArrayList<>();
-        while (columnsOfTheTable.next()) {
-            String columnName = columnsOfTheTable.getString("COLUMN_NAME");
-            columnNamesList.add(columnName);
-        }
-        if (columnNamesList.isEmpty()) {
+        if (getColumnNamesList(connection,tableName).isEmpty()) {
             System.out.println("Table " + tableName + " does not exist or has no columns.");
             return;
         }
@@ -178,7 +164,7 @@ public class DatabaseManager {
 
         try (ResultSet resultSet = statement.executeQuery(selectSQL)) {
             while (resultSet.next()) {
-                for (String columnName : columnNamesList) {
+                for (String columnName : getColumnNamesList(connection,tableName)) {
                     String value = resultSet.getString(columnName);
                     System.out.print(columnName + ": " + value + " | ");
                 }
@@ -193,10 +179,16 @@ public class DatabaseManager {
         menu(connection,statement);
     }
 
+    public static List<String> getColumnNamesList(Connection connection, String tableName) throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
+        ResultSet columnsOfTheTable = metaData.getColumns(null, null, tableName, null);
 
-
-
-
-
+        List<String> columnNamesList = new ArrayList<>();
+        while (columnsOfTheTable.next()) {
+            String columnName = columnsOfTheTable.getString("COLUMN_NAME");
+            columnNamesList.add(columnName);
+        }
+        return columnNamesList;
+    }
 
 }
